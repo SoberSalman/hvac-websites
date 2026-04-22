@@ -382,9 +382,15 @@ export default function LeadPage({ lead }) {
   )
 }
 
-// ── Data fetching ─────────────────────────────────────────────────────────────
+// ── Data fetching (ISR) ───────────────────────────────────────────────────────
+// fallback: 'blocking' → first visit generates the page, all future visits
+// are served from Vercel's edge cache (instant). No slug list needed at build time.
 
-export async function getServerSideProps({ params }) {
+export async function getStaticPaths() {
+  return { paths: [], fallback: 'blocking' }
+}
+
+export async function getStaticProps({ params }) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -408,5 +414,8 @@ export async function getServerSideProps({ params }) {
 
   console.log(`[${params.slug}] colors: primary=${lead.color_primary} secondary=${lead.color_secondary} accent=${lead.color_accent} logo=${lead.logo_url}`)
 
-  return { props: { lead } }
+  return {
+    props: { lead },
+    revalidate: 3600, // regenerate in background at most once per hour
+  }
 }

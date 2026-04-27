@@ -73,14 +73,16 @@ function buildColorCSS(primary, secondary, accent) {
 }
 
 const STARS = [1, 2, 3, 4, 5]
+const FALLBACK_HERO = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAJYetKR0-DBpixzwcxNUT0bLD7cil2GmuK139iO3HD-W8cJV_Z39j_HFZVRPbh4Xrbas1gO6ohIN2iUX6ElBpVmWtyS-gy3MI1lQO1wcCk-cKmWol9deOz9qqclq1ntN1kfDztBJD4NLG5BomC486ygdnwDtyZPzEX6ubkpxx2bVtE-WVT0YtKup4Q7ZN0M-jnSp23ZL_I3ftHb9Y-M0Rb2zu94u-PwZf01cIcX4zU3YO7IMY_wG_6RdIs0BkAM9oEhLV2jcsBttAZ'
 
-export default function LeadPage({ lead }) {
+export default function LeadPage({ lead, heroImage }) {
   const phone        = lead.phone         || ''
   const city         = cleanCity(lead.city) || 'Your City'
   const businessName = lead.business_name || 'Local HVAC'
   const primary      = lead.color_primary   || '#c8a328'
   const secondary    = lead.color_secondary || '#1b3022'
   const accent       = lead.color_accent    || '#0e1a12'
+  const logoUrl      = lead.logo_url?.startsWith('http') ? lead.logo_url : null
 
   // Inline gradient for hero — cannot be reliably overridden via class alone
   const heroGradient = `linear-gradient(to right, ${rgba(secondary, 0.9)}, ${rgba(secondary, 0.4)})`
@@ -100,9 +102,9 @@ export default function LeadPage({ lead }) {
 
             <div className="flex items-center gap-8">
               <a href="#" className="flex items-center gap-3 text-2xl font-black tracking-tighter text-slate-900">
-                {lead.logo_url ? (
+                {logoUrl ? (
                   <img
-                    src={lead.logo_url}
+                    src={logoUrl}
                     alt={businessName}
                     className="h-10 w-auto object-contain"
                     onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'block' }}
@@ -143,7 +145,7 @@ export default function LeadPage({ lead }) {
           <img
             alt={`${city} Skyline`}
             className="w-full h-full object-cover"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJYetKR0-DBpixzwcxNUT0bLD7cil2GmuK139iO3HD-W8cJV_Z39j_HFZVRPbh4Xrbas1gO6ohIN2iUX6ElBpVmWtyS-gy3MI1lQO1wcCk-cKmWol9deOz9qqclq1ntN1kfDztBJD4NLG5BomC486ygdnwDtyZPzEX6ubkpxx2bVtE-WVT0YtKup4Q7ZN0M-jnSp23ZL_I3ftHb9Y-M0Rb2zu94u-PwZf01cIcX4zU3YO7IMY_wG_6RdIs0BkAM9oEhLV2jcsBttAZ"
+            src={heroImage || FALLBACK_HERO}
           />
         </div>
         <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -414,8 +416,25 @@ export async function getStaticProps({ params }) {
 
   console.log(`[${params.slug}] colors: primary=${lead.color_primary} secondary=${lead.color_secondary} accent=${lead.color_accent} logo=${lead.logo_url}`)
 
+  // Fetch city skyline from Unsplash; fall back to hardcoded Toronto image on any error
+  let heroImage = FALLBACK_HERO
+  const unsplashKey = process.env.UNSPLASH_ACCESS_KEY
+  if (unsplashKey) {
+    try {
+      const query = encodeURIComponent(`${cleanCity(lead.city || '')} skyline`)
+      const res   = await fetch(
+        `https://api.unsplash.com/search/photos?query=${query}&per_page=1&orientation=landscape`,
+        { headers: { Authorization: `Client-ID ${unsplashKey}` } }
+      )
+      const json = await res.json()
+      if (json.results?.[0]?.urls?.regular) heroImage = json.results[0].urls.regular
+    } catch (_) {
+      // heroImage stays as FALLBACK_HERO
+    }
+  }
+
   return {
-    props: { lead },
-    revalidate: 3600, // regenerate in background at most once per hour
+    props: { lead, heroImage },
+    revalidate: 3600,
   }
 }

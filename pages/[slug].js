@@ -177,12 +177,22 @@ export default function LeadPage({ lead, heroImage }) {
             { icon: 'bolt',          label: 'Same-Day Service'   },
             { icon: 'star',          label: '5-Star Rated'       },
             { icon: 'payments',      label: 'Upfront Pricing'    },
-          ].map(({ icon, label }) => (
-            <div key={label} className="flex flex-col items-center text-center gap-2">
-              <span className="material-symbols-outlined text-primary text-4xl">{icon}</span>
-              <span className="text-sm font-bold uppercase tracking-wider">{label}</span>
-            </div>
-          ))}
+          ].map(({ icon, label }) => {
+            const isRating = icon === 'star'
+            return (
+              <div key={icon} className="flex flex-col items-center text-center gap-2">
+                <span className="material-symbols-outlined text-primary text-4xl">{icon}</span>
+                {isRating && lead.rating ? (
+                  <>
+                    <span className="text-sm font-bold uppercase tracking-wider">{lead.rating} ★</span>
+                    {lead.reviews && <span className="text-xs text-slate-500">{lead.reviews} Google Reviews</span>}
+                  </>
+                ) : (
+                  <span className="text-sm font-bold uppercase tracking-wider">{label}</span>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
 
@@ -347,7 +357,7 @@ export default function LeadPage({ lead, heroImage }) {
               <h4 className="font-black text-lg mb-6">Contact</h4>
               <ul className="space-y-4 text-white/60">
                 <li className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-primary">location_on</span> {city}
+                  <span className="material-symbols-outlined text-primary">location_on</span> {lead.address || city}
                 </li>
                 <li className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-primary">call</span>
@@ -393,6 +403,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
+  if (params.slug.includes('.')) return { notFound: true }
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

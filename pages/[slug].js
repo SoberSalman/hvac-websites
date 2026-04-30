@@ -351,28 +351,12 @@ export default function LeadPage({ lead, heroImage }) {
       {/* ── Footer ───────────────────────────────────────────────────── */}
       <footer className="bg-deep-green text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             <div>
               <h3 className="text-2xl font-black tracking-tighter mb-6">{businessName}</h3>
               <p className="text-white/60 leading-relaxed">
                 Dedicated to keeping {city} comfortable with expert HVAC services. Licensed, insured, and locally operated.
               </p>
-            </div>
-            <div>
-              <h4 className="font-black text-lg mb-6">Company</h4>
-              <ul className="space-y-4 text-white/60">
-                {['About Us', 'Our Team', 'Testimonials', 'Emergency Service'].map(item => (
-                  <li key={item}><a href="#" className="hover:text-primary transition-colors">{item}</a></li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-black text-lg mb-6">Services</h4>
-              <ul className="space-y-4 text-white/60">
-                {['Furnace Installation', 'AC Repair', 'Heat Pump Service', 'Air Purification'].map(item => (
-                  <li key={item}><a href="#" className="hover:text-primary transition-colors">{item}</a></li>
-                ))}
-              </ul>
             </div>
             <div>
               <h4 className="font-black text-lg mb-6">Contact</h4>

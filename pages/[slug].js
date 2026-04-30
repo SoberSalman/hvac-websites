@@ -121,12 +121,15 @@ export default function LeadPage({ lead, heroImage }) {
             <div className="flex items-center gap-8">
               <a href="#" className="flex items-center gap-3 text-2xl font-black tracking-tighter text-slate-900">
                 {logoUrl ? (
-                  <img
-                    src={logoUrl}
-                    alt={businessName}
-                    className="h-10 w-auto object-contain"
-                    onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'block' }}
-                  />
+                  <>
+                    <img
+                      src={logoUrl}
+                      alt={businessName}
+                      className="h-10 w-auto object-contain"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'inline' }}
+                    />
+                    <span style={{ display: 'none' }}>{businessName}</span>
+                  </>
                 ) : (
                   businessName
                 )}
@@ -215,10 +218,10 @@ export default function LeadPage({ lead, heroImage }) {
       </div>
 
       {/* ── Services ─────────────────────────────────────────────────── */}
-      <section className="py-24 bg-background-light">
+      <section className="py-24" style={{ backgroundColor: 'var(--color-secondary)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black mb-4">Complete HVAC Solutions</h2>
+            <h2 className="text-3xl md:text-4xl font-black mb-4" style={{ color: 'var(--color-text-on-primary)' }}>Complete HVAC Solutions</h2>
             <div className="h-1.5 w-24 bg-primary mx-auto rounded-full" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
